@@ -34,7 +34,7 @@ export class IQOptionApi {
     /**
      * Max wait profile response.
      */
-     private readonly maxWaitToGetDigitalInstrumentData: number = 5000;
+    private readonly maxWaitToGetDigitalInstrumentData: number = 5000;
 
     /**
      * Request ID.
@@ -260,7 +260,7 @@ export class IQOptionApi {
                             instrument_id: `do${market}A${date}D${time}T${realTime}M${sideDigital}SPT`,
                             amount: String(amount),
                             asset_id: market,
-                            instrument_index: instrumentIndex
+                            instrument_index: instrumentIndex,
                         },
                     },
                     requestID
@@ -344,11 +344,13 @@ export class IQOptionApi {
     }
 
     /**
-     * 
-     * @param market 
-     * @returns 
+     *
+     * @param market
+     * @returns
      */
-    public getDigitalOptionInstruments(market: Core.IQOptionMarket): Promise<Core.IQOptionInstruments> {
+    public getDigitalOptionInstruments(
+        market: Core.IQOptionMarket
+    ): Promise<Core.IQOptionInstruments> {
         return this.orderPlacementQueue.schedule(() => {
             Core.logger().silly(`IQOptionApi::getDigitalOptionInstruments`);
             const requestID = this.getNextRequestID();
@@ -356,12 +358,13 @@ export class IQOptionApi {
                 .send(
                     Core.IQOptionName.SEND_MESSAGE,
                     {
-                        name: Core.IQOptionAction.GET_DIGITAL_OPTION_INSTRUMENTS,
+                        name: Core.IQOptionAction
+                            .GET_DIGITAL_OPTION_INSTRUMENTS,
                         version: "1.0",
                         body: {
                             instrument_type: "digital-option",
-                            asset_id: market
-                        }
+                            asset_id: market,
+                        },
                     },
                     requestID
                 )
@@ -369,9 +372,7 @@ export class IQOptionApi {
                     return new Promise((resolve, reject) => {
                         const listener = (message: any) => {
                             const messageJSON = JSON.parse(message.toString());
-                            if (
-                                messageJSON.request_id === String(requestID)
-                            ) {
+                            if (messageJSON.request_id === String(requestID)) {
                                 this.iqOptionWs
                                     .socket()
                                     .off("message", listener);

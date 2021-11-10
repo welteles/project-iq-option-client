@@ -10,6 +10,7 @@ export * from "./IQOptionCurrencyType";
 export * from "./IQOptionOptionOpened";
 export * from "./IQOptionOptionClosed";
 export * from "./IQOptionInstrumentType";
+export * from "./IQOptionInstruments";
 export * from "./IQOptionInitializationData";
 export * from "./IQOptionResult";
 export * from "./IQOptionMode";

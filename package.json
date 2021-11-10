@@ -1,6 +1,6 @@
 {
   "name": "iq.option.client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "IQOPTION CLIENT",
   "main": "dist/index.js",
   "scripts": {
@@ -13,40 +13,24 @@
   },
   "author": "Wellington Rocha",
   "license": "ISC",
-  "dependencies": {
-    "@hapi/joi": "^17.1.0",
-    "@types/bignumber.js": "^5.0.0",
-    "@types/cors": "^2.8.6",
-    "@types/hapi__joi": "^16.0.8",
-    "@types/helmet": "0.0.45",
-    "@types/jsonwebtoken": "^8.3.8",
-    "@types/moment-timezone": "^0.5.30",
-    "@types/ws": "^6.0.4",
-    "async-lock": "^1.2.2",
-    "axios": "^0.19.0",
-    "bignumber.js": "^9.0.0",
-    "bottleneck": "^2.19.5",
-    "cors": "^2.8.5",
-    "events": "^3.0.0",
-    "moment": "^2.24.0",
-    "moment-timezone": "^0.5.28",
-    "rimraf": "^3.0.0",
-    "typescript": "^3.6.4",
-    "winston": "^3.2.1",
-    "ws": "^7.2.1"
-  },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/jest": "^24.0.24",
-    "@types/node": "^12.11.2",
-    "@types/supertest": "^2.0.8",
-    "@types/winston": "^2.4.4",
+    "@types/node": "^16.11.7",
+    "@types/ws": "^8.2.0",
     "jest": "^26.5.3",
-    "jest-cli": "^26.5.3",
-    "prettier": "^2.0.1",
-    "supertest": "^4.0.2",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
     "ts-jest": "^26.4.1",
-    "tslint": "^5.20.0",
+    "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "bottleneck": "^2.19.5",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
+    "typescript": "^4.4.4",
+    "winston": "^3.3.3",
+    "ws": "^8.2.3"
   }
 }

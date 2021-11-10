@@ -7,14 +7,21 @@
  *
  * Proprietary and confidential.
  */
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./Model"));
-__export(require("./IQOptionApi"));
-__export(require("./IQOptionExpired"));
-__export(require("./IQOptionStreamCandleGenerated"));
-__export(require("./IQOptionStreamOptionClose"));
-__export(require("./IQOptionStreamTradersSentiment"));
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi9zcmMvbGliL1NlcnZpY2UvSVFPcHRpb25TZXJ2aWNlL2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQTs7Ozs7OztHQU9HOzs7OztBQUVILDZCQUF3QjtBQUN4QixtQ0FBOEI7QUFDOUIsdUNBQWtDO0FBQ2xDLHFEQUFnRDtBQUNoRCxpREFBNEM7QUFDNUMsc0RBQWlEIn0=
+__exportStar(require("./Model"), exports);
+__exportStar(require("./IQOptionApi"), exports);
+__exportStar(require("./IQOptionExpired"), exports);
+__exportStar(require("./IQOptionStreamCandleGenerated"), exports);
+__exportStar(require("./IQOptionStreamOptionClose"), exports);
+__exportStar(require("./IQOptionStreamTradersSentiment"), exports);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi9zcmMvbGliL1NlcnZpY2UvSVFPcHRpb25TZXJ2aWNlL2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQTs7Ozs7OztHQU9HOzs7Ozs7Ozs7Ozs7QUFFSCwwQ0FBd0I7QUFDeEIsZ0RBQThCO0FBQzlCLG9EQUFrQztBQUNsQyxrRUFBZ0Q7QUFDaEQsOERBQTRDO0FBQzVDLG1FQUFpRCJ9

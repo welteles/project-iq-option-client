@@ -17,6 +17,10 @@ export declare class IQOptionApi {
      */
     private readonly maxWaitToInitializationData;
     /**
+     * Max wait profile response.
+     */
+    private readonly maxWaitToGetDigitalInstrumentData;
+    /**
      * Request ID.
      */
     private requestID;
@@ -61,21 +65,29 @@ export declare class IQOptionApi {
      * @param profitPercent
      * @param amount
      */
-    sendOrderBinary(market: Core.IQOptionMarket, side: Core.IQOptionModel, time: number, userBalanceId: number, profitPercent: number, amount: number): Promise<Core.IQOptionOptionOpened>;
+    sendOrderBinary(market: Core.IQOptionMarket, side: Core.IQOptionModel, time: number, userBalanceId: number, profitPercent: number, amount: number, orderId?: number): Promise<Core.IQOptionOptionOpened>;
     /**
-     * Send order.
+     * Send order digital.
      *
      * @param market
      * @param side
      * @param realTime
      * @param userBalanceId
      * @param amount
+     * @param instrumentIndex
+     * @param orderId
      */
-    sendOrderDigital(market: Core.IQOptionMarket, side: Core.IQOptionModel, realTime: number, userBalanceId: number, amount: number): Promise<Core.IQOptionOptionOpened>;
+    sendOrderDigital(market: Core.IQOptionMarket, side: Core.IQOptionModel, realTime: number, userBalanceId: number, amount: number, instrumentIndex: number, orderId?: number): Promise<Core.IQOptionOptionOpened>;
     /**
      * Get initialization data.
      */
     getInitializationData(): Promise<Core.IQOptionInitializationData>;
+    /**
+     *
+     * @param market
+     * @returns
+     */
+    getDigitalOptionInstruments(market: Core.IQOptionMarket): Promise<Core.IQOptionInstruments>;
     /**
      * Get next request id.
      */

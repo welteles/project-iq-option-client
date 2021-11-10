@@ -14,8 +14,10 @@ import { IQOptionWs } from "./IQOptionWs";
 /**
  * Stream candle generated.
  */
-export class IQOptionStreamOptionTradersSentiment extends Readable
-    implements IIQOptionStream {
+export class IQOptionStreamOptionTradersSentiment
+    extends Readable
+    implements IIQOptionStream
+{
     /**
      * Socket.
      */
