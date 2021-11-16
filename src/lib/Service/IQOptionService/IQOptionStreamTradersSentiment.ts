@@ -52,20 +52,29 @@ export class IQOptionStreamOptionTradersSentiment
         Core.logger().silly(
             "IQOptionStreamOptionTradersSentiment::startStream"
         );
-        return this.subscribeTradersSentiments()
-            .then(() =>
-                this.iqOptionWS
-                    .socket()
-                    .on("message", (data) => this.parseMessage(data.toString()))
-            )
-            .then(() => Promise.resolve())
+        return this.subscribe(this.market)
+            .then(() => this.listener())
             .catch((e) => Promise.reject(e));
     }
 
     /**
+     * Listerner event
+     */
+     public async listener(): Promise<void> {
+        Core.logger().silly(
+            "IQOptionStreamOptionTradersSentiment::listener"
+        );
+        this.iqOptionWS
+            .socket()
+            .on("message", (data) => this.parseMessage(data.toString()));
+        return Promise.resolve();
+    }
+
+
+    /**
      * Candle subscribe.
      */
-    private subscribeTradersSentiments(): Promise<void> {
+    public subscribe(market: Core.IQOptionMarket): Promise<void> {
         Core.logger().silly(
             "IQOptionStreamOptionTradersSentiment::subscribeTradersSentiments"
         );
@@ -77,7 +86,7 @@ export class IQOptionStreamOptionTradersSentiment
             params: {
                 routingFilters: {
                     instrument: "turbo-option",
-                    asset_id: this.market,
+                    asset_id: market,
                 },
             },
         };
