@@ -31,9 +31,13 @@ export declare class IQOptionStreamOptionTradersSentiment extends Readable imple
      */
     startStream(): Promise<void>;
     /**
+     * Listerner event
+     */
+    listener(): Promise<void>;
+    /**
      * Candle subscribe.
      */
-    private subscribeTradersSentiments;
+    subscribe(market: Core.IQOptionMarket): Promise<void>;
     /**
      * On message.
      *
