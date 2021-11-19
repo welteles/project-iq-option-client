@@ -141,7 +141,7 @@ export class IQOptionApi {
         amount: number,
         orderId?: number
     ): Promise<Core.IQOptionOptionOpened> {
-        return this.orderPlacementQueue.schedule(() => {
+        // return this.orderPlacementQueue.schedule(() => {
             Core.logger().silly(`IQOptionApi::sendOrder`, {
                 market,
                 side,
@@ -176,7 +176,7 @@ export class IQOptionApi {
                                 messageJSON.name ===
                                 Core.IQOptionAction.BINARY_OPTION_OPENED
                             ) {
-                                if (messageJSON.msg.active_id === market) {
+                                if (messageJSON.request_id === String(requestID)) {
                                     this.iqOptionWs
                                         .socket()
                                         .off("message", listener);
@@ -187,7 +187,7 @@ export class IQOptionApi {
                                 messageJSON.name ===
                                 Core.IQOptionAction.BINARY_OPTION_REJECT
                             ) {
-                                if (messageJSON.msg.active_id === market) {
+                                if (messageJSON.request_id === String(requestID)) {
                                     this.iqOptionWs
                                         .socket()
                                         .off("message", listener);
@@ -202,7 +202,7 @@ export class IQOptionApi {
                         }, this.maxWaitToSendOrder);
                     });
                 });
-        });
+        // });
     }
 
     /**
@@ -225,7 +225,7 @@ export class IQOptionApi {
         instrumentIndex: number,
         orderId?: number
     ): Promise<Core.IQOptionOptionOpened> {
-        return this.orderPlacementQueue.schedule(() => {
+        // return this.orderPlacementQueue.schedule(() => {
             Core.logger().silly(`IQOptionApi::sendOrder`, {
                 market,
                 side,
@@ -299,7 +299,7 @@ export class IQOptionApi {
                         }, this.maxWaitToSendOrder);
                     });
                 });
-        });
+        // });
     }
 
     /**
