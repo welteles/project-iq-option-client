@@ -141,7 +141,7 @@ export class IQOptionApi {
         amount: number,
         orderId?: number
     ): Promise<Core.IQOptionOptionOpened> {
-        // return this.orderPlacementQueue.schedule(() => {
+        return this.orderPlacementQueue.schedule(() => {
             Core.logger().silly(`IQOptionApi::sendOrder`, {
                 market,
                 side,
@@ -202,7 +202,7 @@ export class IQOptionApi {
                         }, this.maxWaitToSendOrder);
                     });
                 });
-        // });
+        });
     }
 
     /**
@@ -225,7 +225,7 @@ export class IQOptionApi {
         instrumentIndex: number,
         orderId?: number
     ): Promise<Core.IQOptionOptionOpened> {
-        // return this.orderPlacementQueue.schedule(() => {
+        return this.orderPlacementQueue.schedule(() => {
             Core.logger().silly(`IQOptionApi::sendOrder`, {
                 market,
                 side,
@@ -299,7 +299,7 @@ export class IQOptionApi {
                         }, this.maxWaitToSendOrder);
                     });
                 });
-        // });
+        });
     }
 
     /**
