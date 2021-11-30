@@ -8,7 +8,7 @@ import {
 } from "../src/lib";
 const email = "liie.m@excelbangkok.com";
 const password = "Code11054";
-const market = IQOptionMarket.EURUSD;
+const market = IQOptionMarket.EURUSD_OTC;
 describe("IqOptionApi", () => {
     describe("IqOptionClient", () => {
         test("Should return not authenticated user", async (done) => {
@@ -18,6 +18,21 @@ describe("IqOptionApi", () => {
         test("Should return authenticated user", async (done) => {
             const iqOptionClient = new IQOptionApi(email, password);
             iqOptionClient.connectAsync().then(async () => done());
+        });
+        test("Should create reject order binary 1M - BUY", async (done) => {
+            const iqOptionClient = new IQOptionApi(email, password);
+            const profile = await iqOptionClient.connectAsync();
+            const balance = profile.balances
+                .filter((f) => f.type === IQOptionCurrencyType.TEST)
+                .shift();
+            await iqOptionClient.sendOrderBinary(
+                market,
+                IQOptionModel.BUY,
+                iqOptionExpired(1),
+                balance!.id,
+                120,
+                10
+            ).catch(done());
         });
         test("Should create order binary 1M - BUY", async (done) => {
             const iqOptionClient = new IQOptionApi(email, password);

@@ -141,68 +141,70 @@ export class IQOptionApi {
         amount: number,
         orderId?: number
     ): Promise<Core.IQOptionOptionOpened> {
-        return this.orderPlacementQueue.schedule(() => {
-            Core.logger().silly(`IQOptionApi::sendOrder`, {
-                market,
-                side,
-                time,
-                amount,
-            });
-            const requestID = orderId ?? this.getNextRequestID();
-            return this.iqOptionWs
-                .send(
-                    Core.IQOptionName.SEND_MESSAGE,
-                    {
-                        name: Core.IQOptionAction.BINARY_OPEN_OPTION,
-                        version: "1.0",
-                        body: {
-                            active_id: market,
-                            direction: side,
-                            option_type_id: 3,
-                            expired: time,
-                            price: amount,
-                            user_balance_id: userBalanceId,
-                            refund_value: 0, // todo
-                            profit_percent: profitPercent,
-                        },
+        // return this.orderPlacementQueue.schedule(() => {
+        Core.logger().silly(`IQOptionApi::sendOrder`, {
+            market,
+            side,
+            time,
+            amount,
+        });
+        const requestID = orderId ?? this.getNextRequestID();
+        return this.iqOptionWs
+            .send(
+                Core.IQOptionName.SEND_MESSAGE,
+                {
+                    name: Core.IQOptionAction.BINARY_OPEN_OPTION,
+                    version: "1.0",
+                    body: {
+                        active_id: market,
+                        direction: side,
+                        option_type_id: 3,
+                        expired: time,
+                        price: amount,
+                        user_balance_id: userBalanceId,
+                        refund_value: 0, // todo
+                        profit_percent: profitPercent,
                     },
-                    requestID
-                )
-                .then(() => {
-                    return new Promise((resolve, reject) => {
-                        const listener = (message: any) => {
-                            const messageJSON = JSON.parse(message.toString());
-                            if (
-                                messageJSON.name ===
-                                Core.IQOptionAction.BINARY_OPTION_OPENED
-                            ) {
-                                if (messageJSON.request_id === String(requestID)) {
-                                    this.iqOptionWs
-                                        .socket()
-                                        .off("message", listener);
-                                    resolve(messageJSON.msg);
-                                }
-                            }
-                            if (
-                                messageJSON.name ===
-                                Core.IQOptionAction.BINARY_OPTION_REJECT
-                            ) {
-                                if (messageJSON.request_id === String(requestID)) {
+                },
+                requestID
+            )
+            .then(() => {
+                return new Promise((resolve, reject) => {
+                    const listener = (message: any) => {
+                        const messageJSON = JSON.parse(message.toString());
+                        if (
+                            messageJSON.name ===
+                            Core.IQOptionAction.BINARY_OPTION_OPENED
+                        ) {
+                            if (messageJSON.request_id === String(requestID)) {
+                                if (messageJSON.msg?.message) {
                                     this.iqOptionWs
                                         .socket()
                                         .off("message", listener);
                                     reject(messageJSON.msg);
                                 }
+                                this.iqOptionWs
+                                    .socket()
+                                    .off("message", listener);
+                                resolve(messageJSON.msg);
                             }
-                        };
-                        this.iqOptionWs.socket().on("message", listener);
-                        setTimeout(() => {
-                            this.iqOptionWs.socket().off("message", listener);
-                            reject("It was not possible to send order.");
-                        }, this.maxWaitToSendOrder);
-                    });
+                        }
+                        if (
+                            messageJSON.name ===
+                            Core.IQOptionAction.BINARY_OPTION_REJECT
+                        ) {
+                            if (messageJSON.request_id === String(requestID)) {
+                            }
+                        }
+                    };
+                    this.iqOptionWs.socket().on("message", listener);
+                    setTimeout(() => {
+                        this.iqOptionWs.socket().off("message", listener);
+                        reject("It was not possible to send order.");
+                    }, this.maxWaitToSendOrder);
                 });
-        });
+            });
+        // });
     }
 
     /**

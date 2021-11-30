@@ -60,16 +60,13 @@ export class IQOptionStreamOptionTradersSentiment
     /**
      * Listerner event
      */
-     public async listener(): Promise<void> {
-        Core.logger().silly(
-            "IQOptionStreamOptionTradersSentiment::listener"
-        );
+    public async listener(): Promise<void> {
+        Core.logger().silly("IQOptionStreamOptionTradersSentiment::listener");
         this.iqOptionWS
             .socket()
             .on("message", (data) => this.parseMessage(data.toString()));
         return Promise.resolve();
     }
-
 
     /**
      * Candle subscribe.
