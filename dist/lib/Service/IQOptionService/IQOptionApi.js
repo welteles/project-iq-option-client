@@ -49,7 +49,7 @@ class IQOptionApi {
          *  Queue order send.
          */
         this.orderPlacementQueue = new bottleneck_1.default({
-            maxConcurrent: 5,
+            maxConcurrent: 1,
             minTime: 1,
         });
         /**
