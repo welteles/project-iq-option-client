@@ -56,7 +56,7 @@ export class IQOptionApi {
      */
     private readonly orderPlacementQueue = new Bottleneck({
         maxConcurrent: 5,
-        minTime: 1000,
+        minTime: 1,
     });
 
     /**
