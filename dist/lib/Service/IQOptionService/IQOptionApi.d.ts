@@ -37,6 +37,10 @@ export declare class IQOptionApi {
      */
     private readonly orderPlacementQueue;
     /**
+     *  Queue order send.
+     */
+    private readonly nextRequestIDQueue;
+    /**
      * IQOption API.
      *
      * @param email
@@ -91,5 +95,5 @@ export declare class IQOptionApi {
     /**
      * Get next request id.
      */
-    getNextRequestID(): number;
+    getNextRequestID(): Promise<number>;
 }

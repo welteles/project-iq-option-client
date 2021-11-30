@@ -60,6 +60,13 @@ export class IQOptionApi {
     });
 
     /**
+     *  Queue order send.
+     */
+     private readonly nextRequestIDQueue = new Bottleneck({
+        maxConcurrent: 1,
+    });
+
+    /**
      * IQOption API.
      *
      * @param email
@@ -81,11 +88,11 @@ export class IQOptionApi {
             .then((token) => {
                 return this.iqOptionWs
                     .connect()
-                    .then(() =>
+                    .then(async () =>
                         this.iqOptionWs.send(
                             Core.IQOptionName.SSID,
                             token,
-                            this.getNextRequestID()
+                            await this.getNextRequestID()
                         )
                     )
                     .then(() => this.profileAsync())
@@ -132,7 +139,7 @@ export class IQOptionApi {
      * @param profitPercent
      * @param amount
      */
-    public sendOrderBinary(
+    public async sendOrderBinary(
         market: Core.IQOptionMarket,
         side: Core.IQOptionModel,
         time: number,
@@ -148,7 +155,7 @@ export class IQOptionApi {
             time,
             amount,
         });
-        const requestID = orderId ?? this.getNextRequestID();
+        const requestID = orderId ?? await this.getNextRequestID();
         return this.iqOptionWs
             .send(
                 Core.IQOptionName.SEND_MESSAGE,
@@ -218,7 +225,7 @@ export class IQOptionApi {
      * @param instrumentIndex
      * @param orderId
      */
-    public sendOrderDigital(
+    public async sendOrderDigital(
         market: Core.IQOptionMarket,
         side: Core.IQOptionModel,
         realTime: number,
@@ -234,7 +241,7 @@ export class IQOptionApi {
                 realTime,
                 amount,
             });
-            const requestID = orderId ?? this.getNextRequestID();
+            const requestID = orderId ?? await this.getNextRequestID();
             const timeCalculated =
                 Math.floor(
                     parseInt(
@@ -308,9 +315,9 @@ export class IQOptionApi {
      * Get initialization data.
      */
     public getInitializationData(): Promise<Core.IQOptionInitializationData> {
-        return this.orderPlacementQueue.schedule(() => {
+        return this.orderPlacementQueue.schedule(async () => {
             Core.logger().silly(`IQOptionApi::getInitializationData`);
-            const requestID = this.getNextRequestID();
+            const requestID = await this.getNextRequestID();
             return this.iqOptionWs
                 .send(
                     Core.IQOptionName.SEND_MESSAGE,
@@ -353,9 +360,9 @@ export class IQOptionApi {
     public getDigitalOptionInstruments(
         market: Core.IQOptionMarket
     ): Promise<Core.IQOptionInstruments> {
-        return this.orderPlacementQueue.schedule(() => {
+        return this.orderPlacementQueue.schedule(async () => {
             Core.logger().silly(`IQOptionApi::getDigitalOptionInstruments`);
-            const requestID = this.getNextRequestID();
+            const requestID = await this.getNextRequestID();
             return this.iqOptionWs
                 .send(
                     Core.IQOptionName.SEND_MESSAGE,
@@ -394,8 +401,10 @@ export class IQOptionApi {
     /**
      * Get next request id.
      */
-    public getNextRequestID(): number {
-        this.requestID++;
-        return this.requestID;
+    public getNextRequestID(): Promise<number> {
+        return this.nextRequestIDQueue.schedule(() => {
+            this.requestID++;
+            return Promise.resolve(this.requestID);
+        });
     }
 }
