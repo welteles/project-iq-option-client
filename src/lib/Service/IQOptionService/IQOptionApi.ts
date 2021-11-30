@@ -55,14 +55,14 @@ export class IQOptionApi {
      *  Queue order send.
      */
     private readonly orderPlacementQueue = new Bottleneck({
-        maxConcurrent: 1,
-        minTime: 1,
+        maxConcurrent: 5,
+        minTime: 1000,
     });
 
     /**
      *  Queue order send.
      */
-     private readonly nextRequestIDQueue = new Bottleneck({
+    private readonly nextRequestIDQueue = new Bottleneck({
         maxConcurrent: 1,
     });
 
@@ -148,70 +148,74 @@ export class IQOptionApi {
         amount: number,
         orderId?: number
     ): Promise<Core.IQOptionOptionOpened> {
-        // return this.orderPlacementQueue.schedule(() => {
-        Core.logger().silly(`IQOptionApi::sendOrder`, {
-            market,
-            side,
-            time,
-            amount,
-        });
-        const requestID = orderId ?? await this.getNextRequestID();
-        return this.iqOptionWs
-            .send(
-                Core.IQOptionName.SEND_MESSAGE,
-                {
-                    name: Core.IQOptionAction.BINARY_OPEN_OPTION,
-                    version: "1.0",
-                    body: {
-                        active_id: market,
-                        direction: side,
-                        option_type_id: 3,
-                        expired: time,
-                        price: amount,
-                        user_balance_id: userBalanceId,
-                        refund_value: 0, // todo
-                        profit_percent: profitPercent,
+        return this.orderPlacementQueue.schedule(async () => {
+            Core.logger().silly(`IQOptionApi::sendOrder`, {
+                market,
+                side,
+                time,
+                amount,
+            });
+            const requestID = orderId ?? (await this.getNextRequestID());
+            return this.iqOptionWs
+                .send(
+                    Core.IQOptionName.SEND_MESSAGE,
+                    {
+                        name: Core.IQOptionAction.BINARY_OPEN_OPTION,
+                        version: "1.0",
+                        body: {
+                            active_id: market,
+                            direction: side,
+                            option_type_id: 3,
+                            expired: time,
+                            price: amount,
+                            user_balance_id: userBalanceId,
+                            refund_value: 0, // todo
+                            profit_percent: profitPercent,
+                        },
                     },
-                },
-                requestID
-            )
-            .then(() => {
-                return new Promise((resolve, reject) => {
-                    const listener = (message: any) => {
-                        const messageJSON = JSON.parse(message.toString());
-                        if (
-                            messageJSON.name ===
-                            Core.IQOptionAction.BINARY_OPTION_OPENED
-                        ) {
-                            if (messageJSON.request_id === String(requestID)) {
-                                if (messageJSON.msg?.message) {
+                    requestID
+                )
+                .then(() => {
+                    return new Promise((resolve, reject) => {
+                        const listener = (message: any) => {
+                            const messageJSON = JSON.parse(message.toString());
+                            if (
+                                messageJSON.name ===
+                                Core.IQOptionAction.BINARY_OPTION_OPENED
+                            ) {
+                                if (
+                                    messageJSON.request_id === String(requestID)
+                                ) {
+                                    if (messageJSON.msg?.message) {
+                                        this.iqOptionWs
+                                            .socket()
+                                            .off("message", listener);
+                                        reject(messageJSON.msg);
+                                    }
                                     this.iqOptionWs
                                         .socket()
                                         .off("message", listener);
-                                    reject(messageJSON.msg);
+                                    resolve(messageJSON.msg);
                                 }
-                                this.iqOptionWs
-                                    .socket()
-                                    .off("message", listener);
-                                resolve(messageJSON.msg);
                             }
-                        }
-                        if (
-                            messageJSON.name ===
-                            Core.IQOptionAction.BINARY_OPTION_REJECT
-                        ) {
-                            if (messageJSON.request_id === String(requestID)) {
+                            if (
+                                messageJSON.name ===
+                                Core.IQOptionAction.BINARY_OPTION_REJECT
+                            ) {
+                                if (
+                                    messageJSON.request_id === String(requestID)
+                                ) {
+                                }
                             }
-                        }
-                    };
-                    this.iqOptionWs.socket().on("message", listener);
-                    setTimeout(() => {
-                        this.iqOptionWs.socket().off("message", listener);
-                        reject("It was not possible to send order.");
-                    }, this.maxWaitToSendOrder);
+                        };
+                        this.iqOptionWs.socket().on("message", listener);
+                        setTimeout(() => {
+                            this.iqOptionWs.socket().off("message", listener);
+                            reject("It was not possible to send order.");
+                        }, this.maxWaitToSendOrder);
+                    });
                 });
-            });
-        // });
+        });
     }
 
     /**
@@ -235,79 +239,72 @@ export class IQOptionApi {
         orderId?: number
     ): Promise<Core.IQOptionOptionOpened> {
         // return this.orderPlacementQueue.schedule(() => {
-            Core.logger().silly(`IQOptionApi::sendOrder`, {
-                market,
-                side,
-                realTime,
-                amount,
-            });
-            const requestID = orderId ?? await this.getNextRequestID();
-            const timeCalculated =
-                Math.floor(
-                    parseInt(
-                        moment()
-                            .tz("UTC")
-                            .add(realTime, "minutes")
-                            .format("mm"),
-                        undefined
-                    ) / realTime
-                ) * realTime;
-            const time = moment
-                .tz(moment().tz("UTC").format("YYYY-MM-DD HH:00:00"), "UTC")
-                .add(timeCalculated, "minutes")
-                .format("HHmmss");
-            const sideDigital = side === Core.IQOptionModel.BUY ? "C" : "P";
-            const date = moment().tz("UTC").format("YYYYMMDD");
-            return this.iqOptionWs
-                .send(
-                    Core.IQOptionName.SEND_MESSAGE,
-                    {
-                        name: Core.IQOptionAction.DIGITAL_OPEN_OPTION,
-                        version: "2.0",
-                        body: {
-                            user_balance_id: userBalanceId,
-                            instrument_id: `do${market}A${date}D${time}T${realTime}M${sideDigital}SPT`,
-                            amount: String(amount),
-                            asset_id: market,
-                            instrument_index: instrumentIndex,
-                        },
+        Core.logger().silly(`IQOptionApi::sendOrder`, {
+            market,
+            side,
+            realTime,
+            amount,
+        });
+        const requestID = orderId ?? (await this.getNextRequestID());
+        const timeCalculated =
+            Math.floor(
+                parseInt(
+                    moment().tz("UTC").add(realTime, "minutes").format("mm"),
+                    undefined
+                ) / realTime
+            ) * realTime;
+        const time = moment
+            .tz(moment().tz("UTC").format("YYYY-MM-DD HH:00:00"), "UTC")
+            .add(timeCalculated, "minutes")
+            .format("HHmmss");
+        const sideDigital = side === Core.IQOptionModel.BUY ? "C" : "P";
+        const date = moment().tz("UTC").format("YYYYMMDD");
+        return this.iqOptionWs
+            .send(
+                Core.IQOptionName.SEND_MESSAGE,
+                {
+                    name: Core.IQOptionAction.DIGITAL_OPEN_OPTION,
+                    version: "2.0",
+                    body: {
+                        user_balance_id: userBalanceId,
+                        instrument_id: `do${market}A${date}D${time}T${realTime}M${sideDigital}SPT`,
+                        amount: String(amount),
+                        asset_id: market,
+                        instrument_index: instrumentIndex,
                     },
-                    requestID
-                )
-                .then(() => {
-                    return new Promise((resolve, reject) => {
-                        const listener = (message: any) => {
-                            const messageJSON = JSON.parse(message.toString());
-                            if (
-                                messageJSON.name ===
-                                    Core.IQOptionAction.DIGITAL_OPEN_PLACED &&
-                                messageJSON.request_id === String(requestID) &&
-                                messageJSON.status === 2000
-                            ) {
-                                this.iqOptionWs
-                                    .socket()
-                                    .off("message", listener);
-                                resolve(messageJSON.msg);
-                            }
-                            if (
-                                messageJSON.name ===
-                                    Core.IQOptionAction.DIGITAL_OPEN_PLACED &&
-                                messageJSON.request_id === String(requestID) &&
-                                messageJSON.status === 5000
-                            ) {
-                                this.iqOptionWs
-                                    .socket()
-                                    .off("message", listener);
-                                reject(messageJSON.msg);
-                            }
-                        };
-                        this.iqOptionWs.socket().on("message", listener);
-                        setTimeout(() => {
+                },
+                requestID
+            )
+            .then(() => {
+                return new Promise((resolve, reject) => {
+                    const listener = (message: any) => {
+                        const messageJSON = JSON.parse(message.toString());
+                        if (
+                            messageJSON.name ===
+                                Core.IQOptionAction.DIGITAL_OPEN_PLACED &&
+                            messageJSON.request_id === String(requestID) &&
+                            messageJSON.status === 2000
+                        ) {
                             this.iqOptionWs.socket().off("message", listener);
-                            reject("It was not possible to send order.");
-                        }, this.maxWaitToSendOrder);
-                    });
+                            resolve(messageJSON.msg);
+                        }
+                        if (
+                            messageJSON.name ===
+                                Core.IQOptionAction.DIGITAL_OPEN_PLACED &&
+                            messageJSON.request_id === String(requestID) &&
+                            messageJSON.status === 5000
+                        ) {
+                            this.iqOptionWs.socket().off("message", listener);
+                            reject(messageJSON.msg);
+                        }
+                    };
+                    this.iqOptionWs.socket().on("message", listener);
+                    setTimeout(() => {
+                        this.iqOptionWs.socket().off("message", listener);
+                        reject("It was not possible to send order.");
+                    }, this.maxWaitToSendOrder);
                 });
+            });
         // });
     }
 

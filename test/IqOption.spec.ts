@@ -25,14 +25,16 @@ describe("IqOptionApi", () => {
             const balance = profile.balances
                 .filter((f) => f.type === IQOptionCurrencyType.TEST)
                 .shift();
-            await iqOptionClient.sendOrderBinary(
-                market,
-                IQOptionModel.BUY,
-                iqOptionExpired(1),
-                balance!.id,
-                120,
-                10
-            ).catch(done());
+            await iqOptionClient
+                .sendOrderBinary(
+                    market,
+                    IQOptionModel.BUY,
+                    iqOptionExpired(1),
+                    balance!.id,
+                    120,
+                    10
+                )
+                .catch(done());
         });
         test("Should create order binary 1M - BUY", async (done) => {
             const iqOptionClient = new IQOptionApi(email, password);
