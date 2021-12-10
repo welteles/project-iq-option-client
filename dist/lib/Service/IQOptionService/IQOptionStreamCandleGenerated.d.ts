@@ -32,13 +32,21 @@ export declare class IQOptionStreamCandleGenerated extends Readable implements I
      */
     _read(): void;
     /**
+     * Listerner event
+     */
+    listener(): Promise<void>;
+    /**
      * Start stream.
      */
     startStream(): Promise<void>;
     /**
-     * Candle subscribe.
+     * Subscribe
+     *
+     * @param market string
+     * @param time number
+     * @returns void
      */
-    private subscribeCandle;
+    subscribe(market: Core.IQOptionMarket, time: Core.IQOptionTime): Promise<void>;
     /**
      * On message.
      *
