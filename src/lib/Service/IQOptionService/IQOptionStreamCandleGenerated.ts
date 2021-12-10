@@ -57,11 +57,22 @@ export class IQOptionStreamCandleGenerated
     public _read(): void {}
 
     /**
+     * Listerner event
+     */
+     public async listener(): Promise<void> {
+        Core.logger().silly("IQOptionStreamCandleGenerated::listener");
+        this.iqOptionWS
+            .socket()
+            .on("message", (data) => this.parseMessage(data.toString()));
+        return Promise.resolve();
+    }
+
+    /**
      * Start stream.
      */
     public async startStream(): Promise<void> {
         Core.logger().silly("IQOptionStreamCandleGenerated::startStream");
-        return this.subscribeCandle()
+        return this.subscribe(this.market, this.time)
             .then(() =>
                 this.iqOptionWS
                     .socket()
@@ -72,17 +83,21 @@ export class IQOptionStreamCandleGenerated
     }
 
     /**
-     * Candle subscribe.
+     * Subscribe
+     * 
+     * @param market string 
+     * @param time number
+     * @returns void
      */
-    private subscribeCandle(): Promise<void> {
-        Core.logger().silly("IQOptionStreamCandleGenerated::subscribeCandle");
+    public subscribe(market: Core.IQOptionMarket, time: Core.IQOptionTime): Promise<void> {
+        Core.logger().silly("IQOptionStreamCandleGenerated::subscribe");
         if (this.iqOptionWS.isConnected()) {
             return Promise.reject("Socket is not connected.");
         }
         const message = {
             name: Core.IQOptionAction.CANDLE_GENERATED,
             params: {
-                routingFilters: { active_id: this.market, size: this.time },
+                routingFilters: { active_id: market, size: time },
             },
         };
         return Promise.resolve(
