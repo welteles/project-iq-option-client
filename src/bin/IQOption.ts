@@ -89,17 +89,17 @@ iqOptionApi
         // await iqOptionApi.getIQOptionWs().socket().send(JSON.stringify({"name":"sendMessage","request_id":"30","local_time":7747,"msg":{"name":"get-traders-mood","version":"1.0","body":{"instrument":"turbo-option","asset_id":1}}}));
         // await iqOptionApi.getIQOptionWs().socket().send(JSON.stringify({"name":"subscribeMessage","request_id":"s_114","local_time":8897,"msg":{"name":"traders-mood-changed","params":{"routingFilters":{"instrument":"turbo-option","asset_id":"1"}}}}));
 
-        // const time = Core.IQOptionTime.ONE_MINUTE;
+        const time = Core.IQOptionTime.ONE_MINUTE;
         // const responseData = await iqOptionApi.getInitializationData();
         // console.log(responseData.turbo.actives["76"]);
 
         // const responseData2 = await iqOptionApi.getInitializationData();
         // console.log(responseData2);
-        // const candleStream = new Core.IQOptionStreamCandleGenerated(
-        //     iqOptionApi.getIQOptionWs(),
-        //     market,
-        //     time
-        // );
+        const candleStream = new Core.IQOptionStreamCandleGenerated(
+            iqOptionApi.getIQOptionWs(),
+            market,
+            time
+        );
 
         // const balance = findUserBalanceFiat(profile.balances, currency, true);
         // iqOptionApi.getIQOptionWs().socket().on("message", data => console.log(data));
@@ -109,22 +109,23 @@ iqOptionApi
         // await iqOptionApi.getIQOptionWs().send(Core.IQOptionName.SEND_MESSAGE, );
 
         // START STREAM
-        // await candleStream.startStream();
-        // candleStream.on("data", (data: Core.IQOptionCandle) => {
-        //     candles.open.unshift(data.open);
-        //     candles.close.unshift(data.close);
-        //     candles.high.unshift(data.max);
-        //     candles.low.unshift(data.min);
-        //     candles.open = candles.open.slice(0, 100);
-        //     candles.close = candles.close.slice(0, 100);
-        //     candles.open = candles.open.slice(0, 100);
-        //     candles.low = candles.low.slice(0, 100);
-        //     if (candles.close.length > 50) {
-        //         Core.logger().silly(`RSI: ${talib.RSI(candles.close, 17)[0]}`);
-        //         // Core.logger().silly(`MACD: ${talib.MACD(candles.close, 12, 26, 9).macd}`)
-        //     }
-        // });
-        const time = 5;
+        await candleStream.startStream();
+        candleStream.on("data", (data: Core.IQOptionCandle) => {
+            candles.open.unshift(data.open);
+            candles.close.unshift(data.close);
+            candles.high.unshift(data.max);
+            candles.low.unshift(data.min);
+            candles.open = candles.open.slice(0, 100);
+            candles.close = candles.close.slice(0, 100);
+            candles.open = candles.open.slice(0, 100);
+            candles.low = candles.low.slice(0, 100);
+            if (candles.close.length > 50) {
+                console.log(candles);
+                // Core.logger().silly(`RSI: ${talib.RSI(candles.close, 17)[0]}`);
+                // Core.logger().silly(`MACD: ${talib.MACD(candles.close, 12, 26, 9).macd}`)
+            }
+        });
+        // const time = 5;
 
         // SEND ORDER
         // await iqOptionApi.sendOrderDigital(

@@ -59,7 +59,7 @@ export class IQOptionStreamCandleGenerated
     /**
      * Listerner event
      */
-     public async listener(): Promise<void> {
+    public async listener(): Promise<void> {
         Core.logger().silly("IQOptionStreamCandleGenerated::listener");
         this.iqOptionWS
             .socket()
@@ -73,23 +73,22 @@ export class IQOptionStreamCandleGenerated
     public async startStream(): Promise<void> {
         Core.logger().silly("IQOptionStreamCandleGenerated::startStream");
         return this.subscribe(this.market, this.time)
-            .then(() =>
-                this.iqOptionWS
-                    .socket()
-                    .on("message", (data) => this.parseMessage(data.toString()))
-            )
+            .then(() => this.listener())
             .then(() => Promise.resolve())
             .catch((e) => Promise.reject(e));
     }
 
     /**
      * Subscribe
-     * 
-     * @param market string 
+     *
+     * @param market string
      * @param time number
      * @returns void
      */
-    public subscribe(market: Core.IQOptionMarket, time: Core.IQOptionTime): Promise<void> {
+    public subscribe(
+        market: Core.IQOptionMarket,
+        time: Core.IQOptionTime
+    ): Promise<void> {
         Core.logger().silly("IQOptionStreamCandleGenerated::subscribe");
         if (this.iqOptionWS.isConnected()) {
             return Promise.reject("Socket is not connected.");
@@ -112,11 +111,7 @@ export class IQOptionStreamCandleGenerated
      */
     private parseMessage(message: string) {
         const messageJSON = JSON.parse(message);
-        if (
-            messageJSON.name === Core.IQOptionAction.CANDLE_GENERATED &&
-            messageJSON.msg.active_id === this.market &&
-            messageJSON.msg.size === this.time
-        ) {
+        if (messageJSON.name === Core.IQOptionAction.CANDLE_GENERATED) {
             this.emit("data", messageJSON.msg);
         }
     }
