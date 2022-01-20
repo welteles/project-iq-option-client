@@ -17,5 +17,7 @@ export declare enum IQOptionAction {
     INITIALIZATION_DATA = "initialization-data",
     GET_TRADERS_MOOD = "get-traders-mood",
     TRADERS_MOOD_CHANGED = "traders-mood-changed",
-    USER_ALERTS = "user-alerts"
+    USER_ALERTS = "user-alerts",
+    ALERT_CHANGED = "alert-changed",
+    ALERT_TRIGGERED = "alert-triggered"
 }

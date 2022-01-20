@@ -25,6 +25,10 @@ export declare class IQOptionStreamUserAlerts extends Readable implements IIQOpt
      */
     startStream(): Promise<void>;
     /**
+     * Subcribe.
+     */
+    subscribe(): Promise<void>;
+    /**
      * Listerner event
      */
     listener(): Promise<void>;

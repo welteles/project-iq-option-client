@@ -46,6 +46,32 @@ export class IQOptionStreamUserAlerts
     }
 
     /**
+     * Subcribe.
+     */
+    public subscribe(): Promise<void> {
+        Core.logger().silly("IQOptionStreamUserAlerts::subscribe");
+        if (this.iqOptionWS.isConnected()) {
+            return Promise.reject("Socket is not connected.");
+        }
+        const messageAlertChanged = {
+            name: Core.IQOptionAction.ALERT_CHANGED,
+        };
+        const messageAlertTriggered = {
+            name: Core.IQOptionAction.ALERT_TRIGGERED,
+        };
+        return Promise.all([
+            this.iqOptionWS.send(
+                Core.IQOptionName.SUBSCRIBE_MESSAGE,
+                messageAlertChanged
+            ),
+            this.iqOptionWS.send(
+                Core.IQOptionName.SUBSCRIBE_MESSAGE,
+                messageAlertTriggered
+            ),
+        ]).then();
+    }
+
+    /**
      * Listerner event
      */
     public async listener(): Promise<void> {
