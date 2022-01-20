@@ -16,5 +16,6 @@ export declare enum IQOptionAction {
     GET_DIGITAL_OPTION_INSTRUMENTS = "digital-option-instruments.get-instruments",
     INITIALIZATION_DATA = "initialization-data",
     GET_TRADERS_MOOD = "get-traders-mood",
-    TRADERS_MOOD_CHANGED = "traders-mood-changed"
+    TRADERS_MOOD_CHANGED = "traders-mood-changed",
+    USER_ALERTS = "user-alerts"
 }
